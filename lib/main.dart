@@ -1,8 +1,7 @@
-// ignore_for_file: avoid_print
-
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(const MyApp());
@@ -35,47 +34,49 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
-  late stt.SpeechToText _speech;
-  bool _isListening = false;
+  var _speech = stt.SpeechToText();
+  bool islistening = false;
   final _text = TextEditingController();
 
   String dropdown1Value = "Select Language";
   String dropdown2Value = "Select Language";
 
-  void _listen() async{
-    if(!_isListening) {
+  void listen() async{
+    if(!islistening){
       bool available = await _speech.initialize(
-        onStatus: (val) => print('onStatus: $val'),
-        onError: (val) => print('onError: $val'),
+        onStatus: (status) => print("$status"),
+        onError: (error) => print("$error"),
       );
+
       if(available){
-        print("clicked");
         setState(() {
-          _isListening = true;
+          islistening = true;
         });
         _speech.listen(
-          onResult: (val) => setState(() {
-            _text.text = val.recognizedWords;
-            print(val.recognizedWords);
-          }),
+          onResult: (result) => setState(() {
+            _text.text = result.recognizedWords;
+            islistening = false;
+            //TODO: Translate
+
+          })
         );
       }
+
+    }else{
+      setState(() {
+        islistening = false;
+        _speech.stop();
+      });
     }
-    else
-      {
-        setState(() {
-          _isListening = false;
-          _speech.stop();
-        });
-      }
   }
 
   @override
   void initState() {
     // TODO: implement initState
-    super.initState();
-    _text.text = "";
     _speech = stt.SpeechToText();
+    super.initState();
+
+    _text.text = "";
   }
 
   var items = [
@@ -133,7 +134,7 @@ class _HomePageState extends State<HomePage> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
                         // TODO: Title
-                        const Text("Translator",
+                        const Text("Translator1",
                           textAlign: TextAlign.start,
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
@@ -286,10 +287,10 @@ class _HomePageState extends State<HomePage> {
                             children: [
                               Material(
                                 borderRadius: BorderRadius.circular(50),
-                                child: IconButton(onPressed: () { _listen(); }, icon: const Icon(Icons.mic), color: Colors.white,),
+                                child: IconButton(onPressed: () { listen(); }, icon: const Icon(Icons.mic), color: Colors.white,),
                               ),
                               AvatarGlow(
-                                animate: _isListening,
+                                animate: islistening,
                                 glowColor: Theme.of(context).primaryColor,
                                 duration: const Duration(milliseconds: 2000),
                                 repeatPauseDuration: const Duration(milliseconds: 100),
@@ -298,7 +299,7 @@ class _HomePageState extends State<HomePage> {
                                 child: Material(
                                   color: Colors.blue,
                                   borderRadius: BorderRadius.circular(50),
-                                  child: FloatingActionButton(onPressed: () { _listen(); }, child: Icon(_isListening ? Icons.mic : Icons.mic_none, color: Colors.white,)),
+                                  child: FloatingActionButton(onPressed: () { listen(); }, child: Icon(islistening ? Icons.mic : Icons.mic_none, color: Colors.white,)),
                                 ),
                               ),
                               SizedBox(
