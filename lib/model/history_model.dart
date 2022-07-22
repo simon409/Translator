@@ -1,8 +1,8 @@
 class HistoryModel{
-  String TranslationId;
-  String Transfrom;
-  String Transto;
-  String Time;
+  String translationId;
+  String transfrom;
+  String transto;
+  String time;
 
-  HistoryModel(this.TranslationId, this.Transfrom, this.Transto, this.Time);
+  HistoryModel(this.translationId, this.transfrom, this.transto, this.time);
 }
